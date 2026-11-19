@@ -50,151 +50,164 @@ function initTabs() {
     });
   });
 }
-
 /* -------------------------------------------------------------
    MODULO A: SIMULADOR BAIRESDEV (10 RETOS)
 ------------------------------------------------------------- */
 function initModuloA() {
-  // Reto 1: Dados
-  document.getElementById("btn-calc-dados")?.addEventListener("click", () => {
-    const resDados = document.getElementById("res-dados");
+  const botones = document.querySelectorAll("#tab-modulo-a button");
+
+  // Helper para obtener los inputs y el cuadro de resultado de cada tarjeta
+  const obtenerElementos = (indice) => {
+    const btn = botones[indice];
+    if (!btn) return null;
+    const card = btn.parentElement;
+    return {
+      btn,
+      inputs: card.querySelectorAll("input"),
+      resBox: btn.nextElementSibling
+    };
+  };
+
+  // Reto 1: Probabilidad de Dados
+  const r1 = obtenerElementos(0);
+  r1?.btn.addEventListener("click", () => {
     try {
-      const suma = parseInt(document.getElementById("input-dados-suma").value, 10);
+      const suma = parseInt(r1.inputs[0].value, 10);
       const res = calcularProbabilidadDados(suma);
-      resDados.innerHTML = `Suma Objetivo: <strong>${suma}</strong><br>` +
-                           `Casos Favorables: <strong>${res.casosFavorables} / ${res.casosTotales}</strong><br>` +
-                           `Probabilidad Decimal: <strong>${res.probabilidad.toFixed(4)}</strong><br>` +
-                           `Porcentaje: <strong>${res.porcentaje}</strong>`;
+      r1.resBox.innerHTML = `Suma Objetivo: <strong>${suma}</strong><br>` +
+                            `Casos Favorables: <strong>${res.casosFavorables} / ${res.casosTotales}</strong><br>` +
+                            `Probabilidad Decimal: <strong>${res.probabilidad.toFixed(4)}</strong><br>` +
+                            `Porcentaje: <strong>${res.porcentaje}</strong>`;
     } catch (e) {
-      resDados.innerHTML = `<span style="color: var(--accent-red);">${e.message}</span>`;
+      r1.resBox.innerHTML = `<span style="color: var(--accent-red);">${e.message}</span>`;
     }
   });
 
-  // Reto 2: Torneo
-  document.getElementById("btn-calc-torneo")?.addEventListener("click", () => {
-    const resTorneo = document.getElementById("res-torneo");
+  // Reto 2: Torneo Round-Robin
+  const r2 = obtenerElementos(1);
+  r2?.btn.addEventListener("click", () => {
     try {
-      const n = parseInt(document.getElementById("input-torneo-equipos").value, 10);
+      const n = parseInt(r2.inputs[0].value, 10);
       const partidos = calcularPartidosTorneo(n);
-      resTorneo.innerHTML = `Equipos participantes: <strong>${n}</strong><br>` +
+      r2.resBox.innerHTML = `Equipos participantes: <strong>${n}</strong><br>` +
                             `Partidos Totales C(${n}, 2): <strong>${partidos} partidos</strong>`;
     } catch (e) {
-      resTorneo.innerHTML = `<span style="color: var(--accent-red);">${e.message}</span>`;
+      r2.resBox.innerHTML = `<span style="color: var(--accent-red);">${e.message}</span>`;
     }
   });
 
-  // Reto 3: Divisores
-  document.getElementById("btn-calc-div")?.addEventListener("click", () => {
-    const resDiv = document.getElementById("res-div");
+  // Reto 3: Multiplos Menores
+  const r3 = obtenerElementos(2);
+  r3?.btn.addEventListener("click", () => {
     try {
-      const lim = parseInt(document.getElementById("input-div-limite").value, 10);
-      const div = parseInt(document.getElementById("input-div-divisor").value, 10);
+      const lim = parseInt(r3.inputs[0].value, 10);
+      const div = parseInt(r3.inputs[1].value, 10);
       const cant = contarMultiplosMenores(lim, div);
-      resDiv.innerHTML = `Enteros en el rango [1, ${lim - 1}] divisibles por ${div}:<br>` +
-                         `Total: <strong>${cant} números</strong> (Tiempo O(1))`;
+      r3.resBox.innerHTML = `Enteros en el rango [1, ${lim - 1}] divisibles por ${div}:<br>` +
+                            `Total: <strong>${cant} números</strong> (Tiempo O(1))`;
     } catch (e) {
-      resDiv.innerHTML = `<span style="color: var(--accent-red);">${e.message}</span>`;
+      r3.resBox.innerHTML = `<span style="color: var(--accent-red);">${e.message}</span>`;
     }
   });
 
-  // Reto 4: Botellas / Logistica
-  document.getElementById("btn-calc-botellas")?.addEventListener("click", () => {
-    const resBotellas = document.getElementById("res-botellas");
+  // Reto 4: Viajes Minimos (Logistica)
+  const r4 = obtenerElementos(3);
+  r4?.btn.addEventListener("click", () => {
     try {
-      const tot = parseInt(document.getElementById("input-botellas-total").value, 10);
-      const cap = parseInt(document.getElementById("input-botellas-cap").value, 10);
+      const tot = parseInt(r4.inputs[0].value, 10);
+      const cap = parseInt(r4.inputs[1].value, 10);
       const viajes = calcularViajesMinimos(tot, cap);
-      resBotellas.innerHTML = `Botellas totales: <strong>${tot}</strong> (Capacidad: ${cap})<br>` +
-                              `Viajes requeridos: <strong>${viajes} viajes</strong>`;
+      r4.resBox.innerHTML = `Botellas totales: <strong>${tot}</strong> (Capacidad: ${cap})<br>` +
+                            `Viajes requeridos: <strong>${viajes} viajes</strong>`;
     } catch (e) {
-      resBotellas.innerHTML = `<span style="color: var(--accent-red);">${e.message}</span>`;
+      r4.resBox.innerHTML = `<span style="color: var(--accent-red);">${e.message}</span>`;
     }
   });
 
-  // Reto 5: Conteo de digito
-  document.getElementById("btn-calc-digito")?.addEventListener("click", () => {
-    const resDigito = document.getElementById("res-digito");
+  // Reto 5: Conteo de Digito
+  const r5 = obtenerElementos(4);
+  r5?.btn.addEventListener("click", () => {
     try {
-      const n = parseInt(document.getElementById("input-digito-n").value, 10);
-      const d = parseInt(document.getElementById("input-digito-d").value, 10);
+      const n = parseInt(r5.inputs[0].value, 10);
+      const d = parseInt(r5.inputs[1].value, 10);
       const total = contarDigito(n, d);
-      resDigito.innerHTML = `Del 1 al <strong>${n}</strong>, el dígito <strong>${d}</strong> aparece <strong>${total} veces</strong>.`;
+      r5.resBox.innerHTML = `Del 1 al <strong>${n}</strong>, el dígito <strong>${d}</strong> aparece <strong>${total} veces</strong>.`;
     } catch (e) {
-      resDigito.innerHTML = `<span style="color: var(--accent-red);">${e.message}</span>`;
+      r5.resBox.innerHTML = `<span style="color: var(--accent-red);">${e.message}</span>`;
     }
   });
 
-  // Reto 6: Edades relativas
-  document.getElementById("btn-calc-edades")?.addEventListener("click", () => {
-    const resEdades = document.getElementById("res-edades");
+  // Reto 6: Edades Relativas
+  const r6 = obtenerElementos(5);
+  r6?.btn.addEventListener("click", () => {
     try {
-      const pablo = parseInt(document.getElementById("input-edades-pablo").value, 10);
-      const k = parseFloat(document.getElementById("input-edades-k").value);
+      const pablo = parseInt(r6.inputs[0].value, 10);
+      const k = parseFloat(r6.inputs[1].value);
       const res = calcularEdadFutura(pablo, k);
-      resEdades.innerHTML = `Edad hermana hoy: <strong>${res.edadHermana} años</strong><br>` +
+      r6.resBox.innerHTML = `Edad hermana hoy: <strong>${res.edadHermana} años</strong><br>` +
                             `En <strong>${res.anios} años</strong> Pablo tendrá <strong>${res.edadPabloFutura}</strong> y su hermana <strong>${res.edadHermanaFutura}</strong>.`;
     } catch (e) {
-      resEdades.innerHTML = `<span style="color: var(--accent-red);">${e.message}</span>`;
+      r6.resBox.innerHTML = `<span style="color: var(--accent-red);">${e.message}</span>`;
     }
   });
 
-  // Reto 7: Peso recipiente vacio
-  document.getElementById("btn-calc-recipiente")?.addEventListener("click", () => {
-    const resRec = document.getElementById("res-recipiente");
+  // Reto 7: Peso Recipiente Vacio
+  const r7 = obtenerElementos(6);
+  r7?.btn.addEventListener("click", () => {
     try {
-      const lleno = parseFloat(document.getElementById("input-rec-lleno").value);
-      const parcial = parseFloat(document.getElementById("input-rec-parcial").value);
-      const frac = parseFloat(document.getElementById("input-rec-fraccion").value);
+      const lleno = parseFloat(r7.inputs[0].value);
+      const parcial = parseFloat(r7.inputs[1].value);
+      const frac = parseFloat(r7.inputs[2].value);
       const res = calcularPesoRecipiente(lleno, parcial, frac);
-      resRec.innerHTML = `Recipiente vacío: <strong>${res.vacio} g</strong> | Contenido total: <strong>${res.contenido} g</strong>`;
+      r7.resBox.innerHTML = `Recipiente vacío: <strong>${res.vacio} g</strong> | Contenido total: <strong>${res.contenido} g</strong>`;
     } catch (e) {
-      resRec.innerHTML = `<span style="color: var(--accent-red);">${e.message}</span>`;
+      r7.resBox.innerHTML = `<span style="color: var(--accent-red);">${e.message}</span>`;
     }
   });
 
-  // Reto 8: Diferencia de ingresos
-  document.getElementById("btn-calc-ingresos")?.addEventListener("click", () => {
-    const resIng = document.getElementById("res-ingresos");
+  // Reto 8: Diferencia de Ingresos
+  const r8 = obtenerElementos(7);
+  r8?.btn.addEventListener("click", () => {
     try {
-      const q1 = parseInt(document.getElementById("input-ing-q1").value, 10);
-      const p1 = parseInt(document.getElementById("input-ing-p1").value, 10);
-      const q2 = parseInt(document.getElementById("input-ing-q2").value, 10);
-      const p2 = parseInt(document.getElementById("input-ing-p2").value, 10);
+      const q1 = parseInt(r8.inputs[0].value, 10);
+      const p1 = parseInt(r8.inputs[1].value, 10);
+      const q2 = parseInt(r8.inputs[2].value, 10);
+      const p2 = parseInt(r8.inputs[3].value, 10);
       const res = calcularDiferenciaIngreso(q1, p1, q2, p2);
-      resIng.innerHTML = `Antes: <strong>$${res.ingreso1.toFixed(2)}</strong> | Después: <strong>$${res.ingreso2.toFixed(2)}</strong><br>` +
-                         `Diferencia neta: <strong>$${res.diferencia.toFixed(2)}</strong>`;
+      r8.resBox.innerHTML = `Antes: <strong>$${res.ingreso1.toFixed(2)}</strong> | Después: <strong>$${res.ingreso2.toFixed(2)}</strong><br>` +
+                            `Diferencia neta: <strong>$${res.diferencia.toFixed(2)}</strong>`;
     } catch (e) {
-      resIng.innerHTML = `<span style="color: var(--accent-red);">${e.message}</span>`;
+      r8.resBox.innerHTML = `<span style="color: var(--accent-red);">${e.message}</span>`;
     }
   });
 
-  // Reto 9: Ahorro al contado
-  document.getElementById("btn-calc-ahorro")?.addEventListener("click", () => {
-    const resAhorro = document.getElementById("res-ahorro");
+  // Reto 9: Ahorro al Contado
+  const r9 = obtenerElementos(8);
+  r9?.btn.addEventListener("click", () => {
     try {
-      const cuotas = parseInt(document.getElementById("input-aho-cuotas").value, 10);
-      const valor = parseFloat(document.getElementById("input-aho-valor").value);
-      const contado = parseFloat(document.getElementById("input-aho-contado").value);
+      const cuotas = parseInt(r9.inputs[0].value, 10);
+      const valor = parseFloat(r9.inputs[1].value);
+      const contado = parseFloat(r9.inputs[2].value);
       const res = calcularAhorroContado(cuotas, valor, contado);
-      resAhorro.innerHTML = `Total en cuotas: <strong>$${res.totalCuotas.toFixed(2)}</strong><br>` +
+      r9.resBox.innerHTML = `Total en cuotas: <strong>$${res.totalCuotas.toFixed(2)}</strong><br>` +
                             `Ahorro pagando de contado: <strong>$${res.ahorro.toFixed(2)}</strong>`;
     } catch (e) {
-      resAhorro.innerHTML = `<span style="color: var(--accent-red);">${e.message}</span>`;
+      r9.resBox.innerHTML = `<span style="color: var(--accent-red);">${e.message}</span>`;
     }
   });
 
-  // Reto 10: Presupuesto y porcentaje inverso (Cascarita 3)
-  document.getElementById("btn-calc-alquiler")?.addEventListener("click", () => {
-    const resAlq = document.getElementById("res-alquiler");
+  // Reto 10: Presupuesto y Porcentaje Inverso (Cascarita 3)
+  const r10 = obtenerElementos(9);
+  r10?.btn.addEventListener("click", () => {
     try {
-      const comida = parseFloat(document.getElementById("input-alq-comida").value);
-      const pct = parseFloat(document.getElementById("input-alq-porcentaje").value);
+      const comida = parseFloat(r10.inputs[0].value);
+      const pct = parseFloat(r10.inputs[1].value);
       const res = calcularAlquiler(comida, pct);
-      resAlq.innerHTML = `Alquiler total: <strong>$${res.alquiler.toFixed(2)}</strong><br>` +
-                         `Verificación IEEE-754: <code>===</code> da <strong>${res.comparacionEstricta}</strong> | ` +
-                         `<code>Epsilon</code> da <strong>${res.comparacionSegura}</strong>`;
+      r10.resBox.innerHTML = `Alquiler total: <strong>$${res.alquiler.toFixed(2)}</strong><br>` +
+                             `Verificación IEEE-754: <code>===</code> da <strong>${res.comparacionEstricta}</strong> | ` +
+                             `<code>Epsilon</code> da <strong>${res.comparacionSegura}</strong>`;
     } catch (e) {
-      resAlq.innerHTML = `<span style="color: var(--accent-red);">${e.message}</span>`;
+      r10.resBox.innerHTML = `<span style="color: var(--accent-red);">${e.message}</span>`;
     }
   });
 }
