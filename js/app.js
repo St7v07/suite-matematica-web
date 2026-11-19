@@ -1,367 +1,304 @@
 /**
- * Aplicacion Principal - Integracion de Modulos y UI
+ * Modulo A: Retos Logicos BairesDev
+ * Funciones para simulacion de problemas de combinatoria, divisibilidad y logistica.
  */
 
-import { calcularProbabilidadDados, calcularPartidosTorneo, contarMultiplosMenores, calcularViajesMinimos } from "./modules/bairesdev.js";
-import { resolverCuadratica, evaluarPolinomio } from "./modules/cuadratica.js";
-import { analizarSecuencia } from "./modules/secuencias.js";
-import { ejecutarSuiteCompleta } from "./modules/test-suite.js";
-
-document.addEventListener("DOMContentLoaded", () => {
-  initTabs();
-  initModuloA();
-  initModuloB();
-  initModuloC();
-  initModuloD();
-});
-
-/* -------------------------------------------------------------
-   NAVEGACION POR PESTAÑAS
-------------------------------------------------------------- */
-function initTabs() {
-  const tabs = document.querySelectorAll(".nav-tab");
-  const panes = document.querySelectorAll(".tab-pane");
-
-  tabs.forEach(tab => {
-    tab.addEventListener("click", () => {
-      tabs.forEach(t => t.classList.remove("active"));
-      panes.forEach(p => p.classList.remove("active"));
-
-      tab.classList.add("active");
-      const targetId = tab.getAttribute("data-tab");
-      const targetPane = document.getElementById(targetId);
-      if (targetPane) {
-        targetPane.classList.add("active");
-      }
-    });
-  });
-}
-
-/* -------------------------------------------------------------
-   MODULO A: SIMULADOR BAIRESDEV
-------------------------------------------------------------- */
-function initModuloA() {
-  // Reto 1: Dados
-  const btnDados = document.getElementById("btn-calc-dados");
-  const inputDados = document.getElementById("input-dados-suma");
-  const resDados = document.getElementById("res-dados");
-
-  btnDados?.addEventListener("click", () => {
-    try {
-      const suma = parseInt(inputDados.value, 10);
-      const res = calcularProbabilidadDados(suma);
-      resDados.innerHTML = `Suma Objetivo: <strong>${suma}</strong><br>` +
-                           `Casos Favorables: <strong>${res.casosFavorables} / ${res.casosTotales}</strong><br>` +
-                           `Probabilidad Decimal: <strong>${res.probabilidad.toFixed(4)}</strong><br>` +
-                           `Porcentaje: <strong>${res.porcentaje}</strong>`;
-    } catch (e) {
-      resDados.innerHTML = `<span style="color: var(--accent-red);">${e.message}</span>`;
-    }
-  });
-
-  // Reto 2: Torneo
-  const btnTorneo = document.getElementById("btn-calc-torneo");
-  const inputTorneo = document.getElementById("input-torneo-equipos");
-  const resTorneo = document.getElementById("res-torneo");
-
-  btnTorneo?.addEventListener("click", () => {
-    try {
-      const n = parseInt(inputTorneo.value, 10);
-      const partidos = calcularPartidosTorneo(n);
-      resTorneo.innerHTML = `Equipos participantes: <strong>${n}</strong><br>` +
-                            `Partidos Totales C(${n}, 2): <strong>${partidos} partidos</strong>`;
-    } catch (e) {
-      resTorneo.innerHTML = `<span style="color: var(--accent-red);">${e.message}</span>`;
-    }
-  });
-
-  // Reto 3: Divisores
-  const btnDiv = document.getElementById("btn-calc-div");
-  const inputLimite = document.getElementById("input-div-limite");
-  const inputDivisor = document.getElementById("input-div-divisor");
-  const resDiv = document.getElementById("res-div");
-
-  btnDiv?.addEventListener("click", () => {
-    try {
-      const lim = parseInt(inputLimite.value, 10);
-      const div = parseInt(inputDivisor.value, 10);
-      const cant = contarMultiplosMenores(lim, div);
-      resDiv.innerHTML = `Enteros en el rango [1, ${lim - 1}] divisibles por ${div}:<br>` +
-                         `Total: <strong>${cant} números</strong> (Calculado en tiempo O(1))`;
-    } catch (e) {
-      resDiv.innerHTML = `<span style="color: var(--accent-red);">${e.message}</span>`;
-    }
-  });
-
-  // Reto 4: Botellas
-  const btnBotellas = document.getElementById("btn-calc-botellas");
-  const inputTotal = document.getElementById("input-botellas-total");
-  const inputCap = document.getElementById("input-botellas-cap");
-  const resBotellas = document.getElementById("res-botellas");
-
-  btnBotellas?.addEventListener("click", () => {
-    try {
-      const tot = parseInt(inputTotal.value, 10);
-      const cap = parseInt(inputCap.value, 10);
-      const viajes = calcularViajesMinimos(tot, cap);
-      resBotellas.innerHTML = `Botellas totales: <strong>${tot}</strong> (Capacidad por viaje: ${cap})<br>` +
-                              `Viajes requeridos: <strong>${viajes} viajes</strong> (Función techo / ceil)`;
-    } catch (e) {
-      resBotellas.innerHTML = `<span style="color: var(--accent-red);">${e.message}</span>`;
-    }
-  });
-}
-
-/* -------------------------------------------------------------
-   MODULO B: MOTOR CUADRATICO & CANVAS
-------------------------------------------------------------- */
-function initModuloB() {
-  const btnResolver = document.getElementById("btn-resolver-cuadratica");
-  const inputA = document.getElementById("coef-a");
-  const inputB = document.getElementById("coef-b");
-  const inputC = document.getElementById("coef-c");
-
-  const outEq = document.getElementById("out-eq");
-  const outDelta = document.getElementById("out-delta");
-  const outTipo = document.getElementById("out-tipo");
-  const outVertice = document.getElementById("out-vertice");
-  const outRaices = document.getElementById("out-raices");
-
-  const canvas = document.getElementById("parabola-canvas");
-
-  function resolverYDibujar() {
-    const a = parseFloat(inputA.value);
-    const b = parseFloat(inputB.value);
-    const c = parseFloat(inputC.value);
-
-    // Representacion textual
-    const signoB = b >= 0 ? `+ ${b}` : `- ${Math.abs(b)}`;
-    const signoC = c >= 0 ? `+ ${c}` : `- ${Math.abs(c)}`;
-    outEq.textContent = `${a}x² ${signoB}x ${signoC} = 0`;
-
-    const res = resolverCuadratica(a, b, c);
-
-    outDelta.textContent = res.discriminante !== null && res.discriminante !== undefined
-      ? res.discriminante.toExponential(4)
-      : "N/A";
-    outTipo.textContent = res.descripcion;
-
-    if (res.vertice) {
-      outVertice.textContent = `(${res.vertice.h.toFixed(2)}, ${res.vertice.k.toFixed(2)})`;
-    } else {
-      outVertice.textContent = "N/A (Línea o degenerada)";
-    }
-
-    if (res.tipo === "REALES_DISTINTAS") {
-      outRaices.textContent = `x₁ = ${res.raices[0].toFixed(4)}, x₂ = ${res.raices[1].toFixed(4)}`;
-    } else if (res.tipo === "RAIZ_DOBLE") {
-      outRaices.textContent = `x = ${res.raices[0].toFixed(4)} (Doble)`;
-    } else if (res.tipo === "COMPLEJAS_CONJUGADAS") {
-      outRaices.textContent = `${res.raices[0].texto}, ${res.raices[1].texto}`;
-    } else if (res.tipo === "LINEAL_DEGENERADA") {
-      outRaices.textContent = `x = ${res.raices[0].toFixed(4)} (Solución única lineal)`;
-    } else {
-      outRaices.textContent = res.descripcion;
-    }
-
-    dibujarParabola(canvas, a, b, c, res);
+/**
+ * Valida que un valor sea un numero entero y que no sea menor al minimo.
+ * Evita calculos con NaN (campo vacio), decimales o negativos.
+ * @param {number} valor - Valor a validar
+ * @param {string} nombre - Nombre del campo (para el mensaje de error)
+ * @param {number} minimo - Valor minimo permitido
+ */
+function validarEntero(valor, nombre, minimo) {
+  if (!Number.isInteger(valor)) {
+    throw new Error(`${nombre} debe ser un numero entero (sin decimales ni campos vacios).`);
   }
-
-  btnResolver?.addEventListener("click", resolverYDibujar);
-
-  // Chips de presets
-  const chips = document.querySelectorAll(".presets-row .btn-chip[data-a]");
-  chips.forEach(chip => {
-    chip.addEventListener("click", () => {
-      inputA.value = chip.getAttribute("data-a");
-      inputB.value = chip.getAttribute("data-b");
-      inputC.value = chip.getAttribute("data-c");
-      resolverYDibujar();
-    });
-  });
-
-  // Ejecucion inicial
-  resolverYDibujar();
+  if (valor < minimo) {
+    throw new Error(`${nombre} debe ser mayor o igual a ${minimo}.`);
+  }
 }
 
 /**
- * Renderizado de ejes cartesianos y grafica de f(x) = ax^2 + bx + c en Canvas
+ * Reto 1: Probabilidad de suma de 2 dados
+ * @param {number} sumaObjetivo - Suma a evaluar (2 a 12)
+ * @returns {{ casosFavorables: number, casosTotales: number, probabilidad: number, porcentaje: string }}
  */
-function dibujarParabola(canvas, a, b, c, res) {
-  if (!canvas) return;
-  const ctx = canvas.getContext("2d");
-  const W = canvas.width;
-  const H = canvas.height;
-
-  // Limpiar fondo
-  ctx.fillStyle = "#020617";
-  ctx.fillRect(0, 0, W, H);
-
-  // Rango visible centrado en vertice h o 0
-  const centroX = res.vertice ? res.vertice.h : 0;
-  const centroY = res.vertice ? res.vertice.k : 0;
-  const spanX = Math.max(Math.abs(centroX) * 2, 8);
-  const minX = centroX - spanX;
-  const maxX = centroX + spanX;
-
-  // Escala
-  const scaleX = W / (maxX - minX);
-  const originCanvasX = (0 - minX) * scaleX;
-  const originCanvasY = H / 2;
-  const scaleY = H / 20;
-
-  function toScreen(x, y) {
-    return {
-      sx: (x - minX) * scaleX,
-      sy: originCanvasY - (y - centroY) * (scaleY * 0.4)
-    };
+export function calcularProbabilidadDados(sumaObjetivo) {
+  validarEntero(sumaObjetivo, "La suma objetivo", 2);
+  if (sumaObjetivo < 2 || sumaObjetivo > 12) {
+    throw new Error("La suma objetivo en dos dados debe estar entre 2 y 12.");
   }
 
-  // Dibujar Grid y Ejes
-  ctx.strokeStyle = "#1e293b";
-  ctx.lineWidth = 1;
-  for (let i = 0; i <= W; i += 40) {
-    ctx.beginPath();
-    ctx.moveTo(i, 0);
-    ctx.lineTo(i, H);
-    ctx.stroke();
-  }
-  for (let j = 0; j <= H; j += 40) {
-    ctx.beginPath();
-    ctx.moveTo(0, j);
-    ctx.lineTo(W, j);
-    ctx.stroke();
-  }
+  let casosFavorables = 0;
+  const casosTotales = 36; // 6 * 6
 
-  // Ejes X e Y
-  ctx.strokeStyle = "#475569";
-  ctx.lineWidth = 1.5;
-  // Eje X
-  ctx.beginPath();
-  ctx.moveTo(0, originCanvasY);
-  ctx.lineTo(W, originCanvasY);
-  ctx.stroke();
-  // Eje Y
-  ctx.beginPath();
-  ctx.moveTo(originCanvasX, 0);
-  ctx.lineTo(originCanvasX, H);
-  ctx.stroke();
-
-  // Curva de la Parabola
-  ctx.strokeStyle = "#06b6d4";
-  ctx.lineWidth = 2.5;
-  ctx.beginPath();
-  let first = true;
-
-  const steps = 120;
-  const dx = (maxX - minX) / steps;
-  for (let x = minX; x <= maxX; x += dx) {
-    const y = evaluarPolinomio(a, b, c, x);
-    const pt = toScreen(x, y);
-    if (first) {
-      ctx.moveTo(pt.sx, pt.sy);
-      first = false;
-    } else {
-      ctx.lineTo(pt.sx, pt.sy);
-    }
-  }
-  ctx.stroke();
-
-  // Marcar Vertice
-  if (res.vertice) {
-    const ptV = toScreen(res.vertice.h, res.vertice.k);
-    ctx.fillStyle = "#10b981";
-    ctx.beginPath();
-    ctx.arc(ptV.sx, ptV.sy, 5, 0, Math.PI * 2);
-    ctx.fill();
-  }
-
-  // Marcar Raices Reales
-  if (res.tipo === "REALES_DISTINTAS" || res.tipo === "RAIZ_DOBLE") {
-    ctx.fillStyle = "#ef4444";
-    res.raices.forEach(r => {
-      const ptR = toScreen(r, 0);
-      ctx.beginPath();
-      ctx.arc(ptR.sx, ptR.sy, 5, 0, Math.PI * 2);
-      ctx.fill();
-    });
-  }
-}
-
-/* -------------------------------------------------------------
-   MODULO C: DETECTOR DE SECUENCIAS
-------------------------------------------------------------- */
-function initModuloC() {
-  const btnSecuencia = document.getElementById("btn-analizar-secuencia");
-  const inputSec = document.getElementById("input-secuencia");
-  const resSec = document.getElementById("res-secuencia");
-
-  function analizar() {
-    try {
-      const raw = inputSec.value.split(",").map(s => parseFloat(s.trim())).filter(n => !isNaN(n));
-      if (raw.length < 3) {
-        throw new Error("Por favor introduce al menos 3 números válidos separados por comas.");
+  for (let d1 = 1; d1 <= 6; d1++) {
+    for (let d2 = 1; d2 <= 6; d2++) {
+      if (d1 + d2 === sumaObjetivo) {
+        casosFavorables++;
       }
-      const res = analizarSecuencia(raw);
-      resSec.innerHTML = `Secuencia ingresada: <strong>[${raw.join(", ")}]</strong><br>` +
-                         `Patrón detectado: <strong>${res.tipo}</strong><br>` +
-                         `Descripción Matemática: <strong>${res.descripcion}</strong><br>` +
-                         (res.siguienteTermino !== null
-                           ? `Próximo Número Estimado: <strong style="color: var(--accent-green); font-size: 1.15rem;">${res.siguienteTermino}</strong>`
-                           : `<span style="color: var(--accent-orange);">No fue posible predecir con reglas polinómicas simples.</span>`);
-    } catch (e) {
-      resSec.innerHTML = `<span style="color: var(--accent-red);">${e.message}</span>`;
     }
   }
 
-  btnSecuencia?.addEventListener("click", analizar);
+  const probabilidad = casosFavorables / casosTotales;
+  const porcentaje = (probabilidad * 100).toFixed(2) + "%";
 
-  const chips = document.querySelectorAll(".presets-row .btn-chip[data-seq]");
-  chips.forEach(chip => {
-    chip.addEventListener("click", () => {
-      inputSec.value = chip.getAttribute("data-seq");
-      analizar();
-    });
-  });
+  return {
+    casosFavorables,
+    casosTotales,
+    probabilidad,
+    porcentaje
+  };
 }
 
-/* -------------------------------------------------------------
-   MODULO D: SUITE DE PRUEBAS UNITARIAS
-------------------------------------------------------------- */
-function initModuloD() {
-  const btnRun = document.getElementById("btn-run-all-tests");
-  const tableBody = document.getElementById("test-results-body");
-  const summaryBadges = document.getElementById("test-summary-badges");
+/**
+ * Reto 2: Total de partidos de un torneo round-robin
+ * Formula: C(n, 2) = n * (n - 1) / 2
+ * @param {number} n - Cantidad de equipos (n >= 2)
+ * @returns {number}
+ */
+export function calcularPartidosTorneo(n) {
+  validarEntero(n, "La cantidad de equipos", 2);
+  if (n < 2) {
+    throw new Error("Se requieren al menos 2 equipos para jugar un torneo.");
+  }
+  return (n * (n - 1)) / 2;
+}
 
-  btnRun?.addEventListener("click", () => {
-    const suite = ejecutarSuiteCompleta();
+/**
+ * Reto 3: Multiplos estrictamente menores a un limite en tiempo O(1)
+ * @param {number} limite - Limite superior (ej: 904)
+ * @param {number} divisor - Divisor entero positivo (ej: 3)
+ * @returns {number}
+ */
+export function contarMultiplosMenores(limite, divisor) {
+  validarEntero(limite, "El limite", 1);
+  validarEntero(divisor, "El divisor", 1);
+  if (limite <= 1 || divisor <= 0) return 0;
+  // Menores estrictos: [1, limite - 1]
+  return Math.floor((limite - 1) / divisor);
+}
 
-    tableBody.innerHTML = "";
-    suite.resultados.forEach(r => {
-      const tr = document.createElement("tr");
+/**
+ * Reto 4: Minimo de viajes segun capacidad (Funcion Techo / Ceil)
+ * @param {number} totalItems - Cantidad total de elementos a trasladar
+ * @param {number} capacidadPorViaje - Capacidad maxima por viaje
+ * @returns {number}
+ */
+export function calcularViajesMinimos(totalItems, capacidadPorViaje) {
+  validarEntero(totalItems, "El total de botellas", 0);
+  validarEntero(capacidadPorViaje, "La capacidad por viaje", 1);
+  if (totalItems <= 0) return 0;
+  if (capacidadPorViaje <= 0) {
+    throw new Error("La capacidad por viaje debe ser mayor a 0.");
+  }
+  return Math.ceil(totalItems / capacidadPorViaje);
+}
 
-      const catBadge = r.esCascarita
-        ? `<span class="tag-cat trap">${r.categoria}</span>`
-        : `<span class="tag-cat">${r.categoria}</span>`;
+/* =============================================================
+   RETOS NUEVOS (tomados del taller de 25 retos)
+   ============================================================= */
 
-      const statusBadge = r.pass
-        ? `<span class="badge-pass">✔ PASS</span>`
-        : `<span class="badge-fail">✖ FAIL</span>`;
+/**
+ * Valida que un valor sea un numero real (puede tener decimales)
+ * y que no sea menor al minimo.
+ * @param {number} valor - Valor a validar
+ * @param {string} nombre - Nombre del campo (para el mensaje de error)
+ * @param {number} minimo - Valor minimo permitido
+ */
+function validarNumero(valor, nombre, minimo) {
+  if (!Number.isFinite(valor)) {
+    throw new Error(`${nombre} debe ser un numero valido (el campo no puede estar vacio).`);
+  }
+  if (valor < minimo) {
+    throw new Error(`${nombre} debe ser mayor o igual a ${minimo}.`);
+  }
+}
 
-      tr.innerHTML = `
-        <td style="font-family: var(--font-mono); font-weight: bold;">#${r.id}</td>
-        <td><strong>${r.nombre}</strong></td>
-        <td>${catBadge}</td>
-        <td>${statusBadge}</td>
-        <td style="font-family: var(--font-mono); font-size: 0.82rem; color: var(--text-muted);">${r.detalle}</td>
-      `;
-      tableBody.appendChild(tr);
-    });
+/**
+ * Convierte pesos/dolares con decimales a centavos enteros.
+ * Trabajar en centavos evita los residuos de punto flotante (ej: 0.1 + 0.2).
+ * @param {number} valor - Monto con decimales (ej: 2.80)
+ * @returns {number} Monto en centavos (ej: 280)
+ */
+function aCentavos(valor) {
+  return Math.round(valor * 100);
+}
 
-    if (suite.todosAprobados) {
-      summaryBadges.innerHTML = `<span class="badge-status pass">✔ 10/10 PRUEBAS SUPERADAS (${suite.pasados} PASS)</span>`;
-    } else {
-      summaryBadges.innerHTML = `<span class="badge-status fail">✖ ${suite.fallados} PRUEBA(S) FALLADA(S) • ${suite.pasados}/10 PASS</span>`;
+/**
+ * Compara dos numeros decimales con tolerancia (Cascarita 3).
+ * En JS (2.80 / 8.75) * 100 da 32.00000000000001, asi que === 32 falla.
+ * @param {number} a
+ * @param {number} b
+ * @returns {boolean} true si la diferencia es despreciable
+ */
+export function sonCasiIguales(a, b) {
+  return Math.abs(a - b) < Number.EPSILON * 100;
+}
+
+/**
+ * Reto 5: Conteo de un digito en todos los numeros de 1 a N
+ * Ejemplo: del 1 al 30 el digito 1 aparece 13 veces.
+ * Complejidad: O(N * cantidad de digitos de N)
+ * @param {number} n - Limite superior (1 a 1.000.000)
+ * @param {number} digito - Digito a buscar (0 a 9)
+ * @returns {number} Total de apariciones
+ */
+export function contarDigito(n, digito) {
+  validarEntero(n, "El limite N", 1);
+  validarEntero(digito, "El digito", 0);
+  if (digito > 9) {
+    throw new Error("El digito debe estar entre 0 y 9.");
+  }
+  if (n > 1000000) {
+    throw new Error("El limite N maximo es 1.000.000 para no congelar el navegador.");
+  }
+
+  const textoDigito = String(digito);
+  let contador = 0;
+  for (let i = 1; i <= n; i++) {
+    const textoNumero = String(i);
+    for (const caracter of textoNumero) {
+      if (caracter === textoDigito) {
+        contador++;
+      }
     }
-  });
+  }
+  return contador;
+}
+
+/**
+ * Reto 6: Problema de edades relativas
+ * Pablo tiene hoy k veces la edad de su hermana. ¿En cuantos años
+ * Pablo tendra exactamente el doble de la edad de ella?
+ *   hermana = pablo / k
+ *   pablo + t = 2 * (hermana + t)  =>  t = pablo - 2 * hermana
+ * @param {number} edadPablo - Edad actual de Pablo
+ * @param {number} k - Veces que Pablo es mayor que la hermana (k >= 2)
+ * @returns {{ edadHermana: number, anios: number, edadPabloFutura: number, edadHermanaFutura: number }}
+ */
+export function calcularEdadFutura(edadPablo, k) {
+  validarEntero(edadPablo, "La edad de Pablo", 1);
+  validarNumero(k, "El factor k", 2);
+
+  const edadHermana = edadPablo / k;
+  const anios = edadPablo - 2 * edadHermana;
+
+  return {
+    edadHermana,
+    anios,
+    edadPabloFutura: edadPablo + anios,
+    edadHermanaFutura: edadHermana + anios
+  };
+}
+
+/**
+ * Reto 7: Peso del recipiente vacio (proporciones)
+ * lleno   = vacio + contenido
+ * parcial = vacio + fraccion * contenido
+ * Restando: contenido = (lleno - parcial) / (1 - fraccion)
+ * @param {number} pesoLleno - Peso con el recipiente totalmente lleno
+ * @param {number} pesoParcial - Peso con el recipiente lleno hasta la fraccion
+ * @param {number} fraccion - Fraccion llenada (0 <= f < 1), ej: 0.5
+ * @returns {{ vacio: number, contenido: number }}
+ */
+export function calcularPesoRecipiente(pesoLleno, pesoParcial, fraccion) {
+  validarNumero(pesoLleno, "El peso lleno", 0);
+  validarNumero(pesoParcial, "El peso parcial", 0);
+  validarNumero(fraccion, "La fraccion", 0);
+  if (fraccion >= 1) {
+    throw new Error("La fraccion debe ser menor que 1 (si es 1 el recipiente esta lleno y no se puede despejar).");
+  }
+  if (pesoParcial > pesoLleno) {
+    throw new Error("El peso parcial no puede ser mayor que el peso lleno.");
+  }
+
+  const contenido = (pesoLleno - pesoParcial) / (1 - fraccion);
+  const vacio = pesoLleno - contenido;
+  if (vacio < 0) {
+    throw new Error("Los datos no son posibles: el recipiente daria un peso negativo.");
+  }
+
+  return {
+    vacio: Math.round(vacio * 100) / 100,
+    contenido: Math.round(contenido * 100) / 100
+  };
+}
+
+/**
+ * Reto 8: Diferencia de ingresos al cambiar el precio
+ * Todo se calcula en centavos enteros y solo al final se pasa a dolares.
+ * @param {number} q1 - Vasos vendidos antes
+ * @param {number} p1 - Precio antes (centavos)
+ * @param {number} q2 - Vasos vendidos despues
+ * @param {number} p2 - Precio despues (centavos)
+ * @returns {{ ingreso1: number, ingreso2: number, diferencia: number }} Valores en dolares
+ */
+export function calcularDiferenciaIngreso(q1, p1, q2, p2) {
+  validarEntero(q1, "Los vasos iniciales", 0);
+  validarEntero(p1, "El precio inicial", 0);
+  validarEntero(q2, "Los vasos finales", 0);
+  validarEntero(p2, "El precio final", 0);
+
+  const ingreso1Centavos = q1 * p1;
+  const ingreso2Centavos = q2 * p2;
+
+  return {
+    ingreso1: ingreso1Centavos / 100,
+    ingreso2: ingreso2Centavos / 100,
+    diferencia: (ingreso2Centavos - ingreso1Centavos) / 100
+  };
+}
+
+/**
+ * Reto 9: Ahorro al pagar de contado en vez de cuotas
+ * Se trabaja en centavos para que 12 cuotas de 88.10 no den residuos.
+ * @param {number} nCuotas - Cantidad de cuotas
+ * @param {number} valorCuota - Valor de cada cuota
+ * @param {number} precioContado - Precio pagando de contado
+ * @returns {{ totalCuotas: number, ahorro: number }}
+ */
+export function calcularAhorroContado(nCuotas, valorCuota, precioContado) {
+  validarEntero(nCuotas, "La cantidad de cuotas", 1);
+  validarNumero(valorCuota, "El valor de la cuota", 0);
+  validarNumero(precioContado, "El precio de contado", 0);
+
+  const totalCentavos = nCuotas * aCentavos(valorCuota);
+  const ahorroCentavos = totalCentavos - aCentavos(precioContado);
+
+  return {
+    totalCuotas: totalCentavos / 100,
+    ahorro: ahorroCentavos / 100
+  };
+}
+
+/**
+ * Reto 10: Presupuesto y porcentaje inverso (incluye la Cascarita 3)
+ * Si la comida es el P% del alquiler: alquiler = comida * 100 / P
+ * Luego verifica con tolerancia que comida sea realmente el P% del alquiler.
+ * @param {number} comida - Gasto en comida (ej: 2.80)
+ * @param {number} porcentaje - Porcentaje que representa (ej: 32)
+ * @returns {{ alquiler: number, porcentajeCalculado: number, comparacionEstricta: boolean, comparacionSegura: boolean }}
+ */
+export function calcularAlquiler(comida, porcentaje) {
+  validarNumero(comida, "El gasto en comida", 0);
+  validarNumero(porcentaje, "El porcentaje", 0);
+  if (porcentaje === 0) {
+    throw new Error("El porcentaje debe ser mayor que 0 (no se puede dividir entre 0).");
+  }
+
+  // Se divide en centavos y se redondea al centavo mas cercano
+  const alquilerCentavos = Math.round((aCentavos(comida) * 100) / porcentaje);
+  const alquiler = alquilerCentavos / 100;
+
+  // Verificacion: ¿comida / alquiler * 100 es igual al porcentaje?
+  const porcentajeCalculado = alquiler === 0 ? 0 : (comida / alquiler) * 100;
+
+  return {
+    alquiler,
+    porcentajeCalculado,
+    comparacionEstricta: porcentajeCalculado === porcentaje,
+    comparacionSegura: sonCasiIguales(porcentajeCalculado, porcentaje)
+  };
 }
