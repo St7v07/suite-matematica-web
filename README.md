@@ -1,6 +1,6 @@
 # Suite Matemática y Algorítmica (Proyecto Integrador)
 
-[![pages-build-deployment](https://github.com/St7v07/suite-logica/actions/workflows/pages/pages-build-deployment/badge.svg)](https://github.com/St7v07/suite-logica/actions/workflows/pages/pages-build-deployment)
+[![pages-build-deployment](https://github.com/St7v07/suite-matematica-web/actions/workflows/pages/pages-build-deployment/badge.svg)](https://github.com/St7v07/suite-logica/actions/workflows/pages/pages-build-deployment)
 
 🌐 **Demo en vivo:** https://St7v07.github.io/suite-logica/
 
