@@ -2,7 +2,7 @@
 
 Aplicación web interactiva que reúne retos de lógica (BairesDev), un solucionador de ecuaciones cuadráticas con gráfica, un detector de secuencias y una suite de pruebas unitarias en el navegador.
 
-**Estudiante:** Pablo Quiroga — SENA, Análisis y Desarrollo de Software (ADSO)
+**Estudiante:** Jhon Estiven Ortiz Martinez — SENA, Análisis y Desarrollo de Software (ADSO)
 
 ## 1. Módulos
 
